@@ -18,6 +18,15 @@ const Country = (props) => {
   );
 };
 
+const Header = (props) => {
+  return (
+    <div>
+      <p> find country </p>
+      <input value={props.selectCountry} onChange={props.handleSelectCountry} />
+    </div>
+  );
+};
+
 const App = () => {
   const [data, setData] = useState([]);
   const [selectCountry, setSelectCountry] = useState("select country");
@@ -37,38 +46,55 @@ const App = () => {
     });
   }, []);
 
+  const openCountryView = (url) => {
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
   console.log(countries);
 
   if (countries.length === 0) {
     return (
-      <div>
-        <p> find country </p>
-        <input value={selectCountry} onChange={handleSelectCountry} />
-      </div>
+      <Header
+        selectCountry={selectCountry}
+        handleSelectCountry={handleSelectCountry}
+      />
     );
   } else if (countries.length <= 10 && countries.length !== 1) {
     return (
       <div>
-        <p> find country </p>
-        <input value={selectCountry} onChange={handleSelectCountry} />
+        <Header
+          selectCountry={selectCountry}
+          handleSelectCountry={handleSelectCountry}
+        />
         {countries.map((country) => (
-          <p key={country.tld}>{country.name.common}</p>
+          <>
+            <p key={country.tld}>
+              {country.name.common}{" "}
+              <button onClick={() => openCountryView(country.maps.googleMaps)}>
+                show
+              </button>
+            </p>
+          </>
         ))}
       </div>
     );
   } else if (countries.length > 10) {
     return (
       <div>
-        <p> find country </p>
-        <input value={selectCountry} onChange={handleSelectCountry} />
+        <Header
+          selectCountry={selectCountry}
+          handleSelectCountry={handleSelectCountry}
+        />
         <p>Too many matches</p>
       </div>
     );
   } else if (countries.length === 1) {
     return (
       <div>
-        <p> find country </p>
-        <input value={selectCountry} onChange={handleSelectCountry} />
+        <Header
+          selectCountry={selectCountry}
+          handleSelectCountry={handleSelectCountry}
+        />
         <Country countries={countries} />
       </div>
     );
