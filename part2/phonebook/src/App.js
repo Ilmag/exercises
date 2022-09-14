@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
+import phoneServices from "./services/phones.js";
 import axios from "axios";
+const baseUrl = "http://localhost:3001/persons";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -12,9 +14,7 @@ const App = () => {
   const [filteredPersons, setFilteredPersons] = useState([]);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3001/persons")
-      .then((response) => setPersons(response.data));
+    phoneServices.getAll().then((initialData) => setPersons(initialData));
   }, []);
 
   const handleNewName = (e) => {
@@ -38,20 +38,31 @@ const App = () => {
     }
   };
 
+  const removeItem = (id) => {
+    const personsName = persons.filter((person) => person.id === id)[0].name;
+    if (window.confirm(`Delete ${personsName}?`)) {
+      setPersons(persons.filter((person) => person.id !== id));
+      axios
+        .delete(`${baseUrl}/${id}`)
+        .then((response) => console.log(response));
+    }
+  };
+
   const addNewPerson = (e) => {
     e.preventDefault();
     const newPerson = {
-      id: persons.length + 1,
       name: newName,
       number: newNumber,
     };
     if (persons.map((person) => person.name).includes(newPerson.name)) {
       alert(`${newPerson.name} is already added to phonebook`);
     } else {
-      setPersons(persons.concat(newPerson));
-      setNewName("");
-      setNewNumber("");
-      setFilteredPersons(persons.concat(newPerson));
+      phoneServices.create(newPerson).then((returnedData) => {
+        setPersons(persons.concat(returnedData));
+        setNewName("");
+        setNewNumber("");
+        setFilteredPersons(persons.concat(returnedData));
+      });
     }
   };
 
@@ -75,9 +86,20 @@ const App = () => {
         />{" "}
       </div>{" "}
       <h3> Numbers </h3>{" "}
-      <Persons filteredPersons={filteredPersons} persons={persons} />{" "}
+      <Persons
+        filteredPersons={filteredPersons}
+        persons={persons}
+        removeItem={removeItem}
+      />{" "}
     </div>
   );
 };
 
 export default App;
+
+// axios
+//       .delete(`${baseUrl}/${id}`)
+//       .then(console.log(persons))
+//       .then(setPersons(persons.filter((person) => person.id !== id)))
+//       .then(console.log(persons))
+//       .then(setFilteredPersons(persons));
