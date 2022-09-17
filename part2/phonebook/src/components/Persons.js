@@ -1,30 +1,23 @@
 const Persons = (props) => {
-  // const removeItem = () => {
-  //   console.log("clicked");
-  // };
-  if (props.filteredPersons.length > 0) {
-    return (
-      <div>
-        {props.filteredPersons.map((person) => (
-          <p key={person.id}>
+  return (
+    <div>
+      {" "}
+      {props.persons
+        .filter((person) =>
+          person.name.toLowerCase().includes(props.filter.toLowerCase())
+        )
+        .map((person) => (
+          <p key={person.name}>
+            {" "}
             {person.name} {person.number}{" "}
-            <button onClick={() => props.removeItem(person.id)}>delete</button>
+            <button onClick={() => props.removePerson(person.id)}>
+              {" "}
+              delete{" "}
+            </button>{" "}
           </p>
-        ))}
-      </div>
-    );
-  } else {
-    return (
-      <div>
-        {props.persons.map((person) => (
-          <p key={person.id}>
-            {person.name} {person.number}{" "}
-            <button onClick={() => props.removeItem(person.id)}>delete</button>
-          </p>
-        ))}
-      </div>
-    );
-  }
+        ))}{" "}
+    </div>
+  );
 };
 
 export default Persons;
