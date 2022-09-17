@@ -4,6 +4,7 @@ import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
 import Notification from "./components/Notification";
+import ErrorMessage from "./components/ErrorMessage";
 import phoneServices from "./services/phones";
 
 const App = () => {
@@ -12,6 +13,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
   const [notification, setNotification] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     phoneServices.getAll().then((data) => setPersons(data));
@@ -40,7 +42,7 @@ const App = () => {
         .then((person) => setPersons(persons.concat(person)));
       setNewName("");
       setNewNumber("");
-      setNotification(`Added ${newPerson.name}.`);
+      setNotification(`Added ${newPerson.name}`);
       setTimeout(() => {
         setNotification(null);
       }, 5000);
@@ -61,7 +63,15 @@ const App = () => {
                 person.id !== personsID ? person : returned
               )
             )
-          );
+          )
+          .catch((error) => {
+            setErrorMessage(
+              `Information of ${newPerson.name} has already been removed from the server`
+            );
+            setTimeout(() => {
+              setErrorMessage(null);
+            }, 5000);
+          });
         setNewName("");
         setNewNumber("");
         setNotification(`${newPerson.name}s number changed.`);
@@ -76,14 +86,25 @@ const App = () => {
     const personsName = persons.filter((person) => person.id === id)[0].name;
     const restPersons = persons.filter((person) => person.id !== id);
     if (window.confirm(`Delete ${personsName}?`)) {
-      phoneServices.remove(id).then(setPersons(restPersons));
+      phoneServices
+        .remove(id)
+        .then(setPersons(restPersons))
+        .catch((error) => {
+          setErrorMessage(
+            `Information of ${personsName} has already been removed from the server`
+          );
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 5000);
+        });
     }
   };
 
   return (
     <div>
       <h2> Phonebook </h2>
-      <Notification notification={notification} />
+      <Notification notification={notification} errorMessage={errorMessage} />
+      <ErrorMessage errorMessage={errorMessage} />
       <Filter filter={filter} handleFilter={handleFilter} />
       <h3>add a new</h3>
       <PersonForm

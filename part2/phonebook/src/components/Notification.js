@@ -1,4 +1,4 @@
-const Notification = ({ notification }) => {
+const Notification = ({ notification, errorMessage }) => {
   const noteStyle = {
     backgroundColor: "#c0c4c1",
     backgroundColorOpacity: 0.6,
@@ -13,9 +13,7 @@ const Notification = ({ notification }) => {
     paddingLeft: "5px",
   };
 
-  const noStyle = {};
-
-  if (notification === null) {
+  if (notification === null || errorMessage !== null) {
     return null;
   } else {
     return (
